@@ -1,5 +1,5 @@
 const express = require('express');
-const mysql = require('mysql2')
+const mysql = require('mysql2') //mysql로 진행 시 1025 error
 const app = express();
 const db = require('./config/database');
 
