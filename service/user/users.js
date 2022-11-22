@@ -14,7 +14,7 @@ router.post('/login', ( req, res ) => {
                 console.log(err);
                 throw err;
             } else if ( row.length == 0 ) {
-                res.status(400).send({message : "Invalid Password"});
+                res.status(400).send({message : "Invalid Email"});
             } else {
                 let user = row[0];
                 // console.log(row[0].password);
