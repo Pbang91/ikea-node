@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const getConnection = require('./../../config/database');
+const checkRegex = require('./regex');
 
 router.post('/login', ( req, res ) => {
     let email = req.body.email;
@@ -31,12 +32,9 @@ router.post('/login', ( req, res ) => {
 });
 
 router.post('/sign-up', ( req, res ) => {
-    let regExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
-    let regPw = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
-    
-    if ( !regExp.test(req.body.email) || !regPw.test(req.body.password)) {
-        res.send('Invalid User Information');
-    } else {
+    let regexResult = checkRegex(req.body.email, req.body.password);
+
+    if (regexResult) {
         getConnection(( conn ) => {
             let sql = `INSERT INTO users (email, password) VALUES(?, ?)`;
             let hashedPassword = bcrypt.hashSync(req.body.password, 10);
@@ -56,12 +54,14 @@ router.post('/sign-up', ( req, res ) => {
                                 message : "success",
                                 userId  : result.insertId
                             }
-                            res.status(200).send(message);
+                            res.status(201).send(message);
                         }
                     })
                 }
             });
         });
+    } else {
+        res.status(400).send({message : "Invalid User Information"});
     }
 });
 
@@ -73,7 +73,7 @@ router.get('/', ( req, res ) => {
                     console.log(err);
                     throw err;
                 } else {
-                    res.send(rows)
+                    res.status(200).send(rows)
                 }
             }
         );
