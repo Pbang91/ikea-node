@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const getConnection = require('./../../config/database');
-const checkRegex = require('./regex');
+const usersUtil = require('./utils');
 
 router.post('/login', ( req, res ) => {
     let email = req.body.email;
@@ -18,11 +18,13 @@ router.post('/login', ( req, res ) => {
                 res.status(400).send({message : "Invalid Email"});
             } else {
                 let user = row[0];
-                // console.log(row[0].password);
-                let checkPassword = bcrypt.compareSync(password, user.password);
-
+                let checkPassword = usersUtil.comparePassword(password, user.password);
+                
                 if (checkPassword) {
-                    res.status(200).send({message : "Success", userId : user.id});
+                    let accessToken = usersUtil.createAccessToken(userId=user.id)
+                    res.status(200).send({
+                        message : "Success",
+                        accessToken});
                 } else {
                     res.status(400).send({message : "Invalid Password"});
                 }
@@ -32,13 +34,14 @@ router.post('/login', ( req, res ) => {
 });
 
 router.post('/sign-up', ( req, res ) => {
-    let regexResult = checkRegex(req.body.email, req.body.password);
+    let regexResult = usersUtil.checkRegex(req.body.email, req.body.password);
 
     if (regexResult) {
         getConnection(( conn ) => {
             let sql = `INSERT INTO users (email, password) VALUES(?, ?)`;
-            let hashedPassword = bcrypt.hashSync(req.body.password, 10);
+            let hashedPassword = usersUtil.hashPassword(req.body.password);
             let param = [req.body.email, hashedPassword];
+
             conn.query(`SELECT * FROM users WHERE email="${req.body.email}"`, ( err, row ) => {
                 if (err) {
                     console.log(err);
@@ -50,10 +53,11 @@ router.post('/sign-up', ( req, res ) => {
                         if (err) {
                             res.status(500).send({message : "Internal Server Error"});
                         } else {
-                            var message = {
+                            let message = {
                                 message : "success",
-                                userId  : result.insertId
+                                userId : result.insertId
                             }
+
                             res.status(201).send(message);
                         }
                     })
