@@ -33,14 +33,23 @@ router.post('/login', ( req, res ) => {
     });
 });
 
-router.post('/sign-up', ( req, res ) => {
+router.post('/signup', ( req, res ) => {
     let regexResult = usersUtil.checkRegex(req.body.email, req.body.password);
 
     if (regexResult) {
         getConnection(( conn ) => {
-            let sql = `INSERT INTO users (email, password) VALUES(?, ?)`;
+            let sql = `INSERT INTO users (full_name, email, membership, address, phone_number, gender_id, password)
+             VALUES(?, ?, ?, ?, ?, ?, ?)`;
             let hashedPassword = usersUtil.hashPassword(req.body.password);
-            let param = [req.body.email, hashedPassword];
+            let param = [
+                req.body.full_name,
+                req.body.email,
+                req.body.membership,
+                req.body.address,
+                req.body.phone_number,
+                req.body.gender_id,
+                hashedPassword
+            ];
 
             conn.query(`SELECT * FROM users WHERE email="${req.body.email}"`, ( err, row ) => {
                 if (err) {
@@ -57,7 +66,7 @@ router.post('/sign-up', ( req, res ) => {
                                 message : "success",
                                 userId : result.insertId
                             }
-
+                            
                             res.status(201).send(message);
                         }
                     })
