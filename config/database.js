@@ -1,11 +1,11 @@
-const dbInfo = require('./../env');
+const env = require('./../env');
 const mysql = require('mysql2') //mysql로 진행 시 1025 error -> mysql2로 변경
 
 const db = {
-    host     : dbInfo.host,
-    user     : dbInfo.user,
-    password : dbInfo.password,
-    database : dbInfo.database
+    host     : env.dbInfo.host,
+    user     : env.dbInfo.user,
+    password : env.dbInfo.password,
+    database : env.dbInfo.database
 }
 
 const pool = mysql.createPool(db);
