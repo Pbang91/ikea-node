@@ -1,26 +1,34 @@
 const router = require('express').Router();
 const getConnection = require('./../../config/database');
 
-router.get('/product', ( req, res ) => {
-    let subCategoryId = req.query.sub_category_id;
-    let limit = req.query.limit
-    let offset = req.query.offset
-    let sortOption = req.query.sort
-    let filterBoolena = req.query.filter_boolean
+router.get('/:category', ( req, res ) => {
+    let category = req.params['category']
+    console.log(req.query);
+    console.log(req.query.filters.split('-'));
 
-    if (limit === undefined) {
-        limit = 10;
-    }
-    if (offset === undefined) {
-        offset = 0;
-    }
-    if (sortOption === undefined) {
-        sortOption = "default";
-    }
-    if (filterBoolena === undefined) {
-        filterBoolena = false;
+    let sort = {
+        "PRICE_LOW_TO_HIGH" : "ASC",
+        "PRICE_HIGH_TO_LOW" : "DESC"
     }
 
+    let sort_query = sort[req.query.sort] || "";
     
+    filters = {
+        colors,
+        price
+    }
 
+    let sql = `SELECT * FROM sub_categories AS s LEFT JOIN products AS p ON s.id = p.sub_category_id WHERE s.name="${category}";`
+    getConnection((conn) => {
+        conn.query(sql, (err, rows) => {
+            if (err) {
+                console.log(err);
+                throw err;
+            } else {
+                res.status(200).send(rows)
+            }
+        });
+    });
 });
+
+module.exports = router;
