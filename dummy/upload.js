@@ -6,4 +6,6 @@ const uploadCsv = require('./common')
 // let tableList = [
 //     [""]
 // ]
+const FILE_NAME = "product.csv"
+const TABLE_NAME = "products"
 uploadCsv(FILE_NAME, TABLE_NAME);

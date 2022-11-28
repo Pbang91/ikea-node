@@ -1,9 +1,3 @@
-CREATE TABLE discounts (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    rate int DEFAULT 0,
-    type varchar(200)
-);
-
 CREATE TABLE main_categories (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name varchar(50)
@@ -25,8 +19,7 @@ CREATE TABLE products (
     sub_category_id int,
     discount_id int,
     created_at datetime DEFAULT now(),    
-    FOREIGN KEY (sub_category_id) REFERENCES sub_categories (id) ON DELETE CASCADE,
-    FOREIGN KEY (discount_id) REFERENCES discounts (id) ON DELETE CASCADE
+    FOREIGN KEY (sub_category_id) REFERENCES sub_categories (id) ON DELETE CASCADE
 );
 
 CREATE TABLE images (
